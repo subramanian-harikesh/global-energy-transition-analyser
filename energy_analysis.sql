@@ -445,7 +445,7 @@ WITH renewable_share AS (
      GROUP BY dc.country_name, fc.year
      ORDER BY fc.year DESC
 ), high_GDP AS (
-    SELECT 
+    SELECT  
 	      country_id, year
           gdp_per_capita
     FROM fact_country_meta
