@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from urllib.parse import quote_plus
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__),'../.env'))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../.env'))
 
 
 # -- Configuration
@@ -13,7 +13,6 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
-
 
 
 CSV_PATH = "../owid_energy_data.csv"
@@ -54,7 +53,7 @@ print("\n Establishing Connection to MySQL...\n")
 connection_string = f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(connection_string)
 
-# Connection Test 
+# Connection Test
 with engine.connect() as conn:
     result = conn.execute(text("SELECT DATABASE();"))
     print(f"Connection to: {result.fetchone()[0]}")
@@ -70,4 +69,5 @@ df_clean.to_sql(
     index=False
 )
 
-print(f"Data loaded successfully. {len(df_clean)} rows inserted into owid_energy_raw.")
+print(
+    f"Data loaded successfully. {len(df_clean)} rows inserted into owid_energy_raw.")
