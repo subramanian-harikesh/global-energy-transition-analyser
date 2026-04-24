@@ -9,6 +9,7 @@ A data analytics portfolio project that models global energy consumption pattern
 - [Project Overview](#project-overview)
 - [Why This Project](#why-this-project)
 - [Dataset](#dataset)
+- [Project Structure](#project-structure)
 - [Project Architecture](#project-architecture)
 - [Database Design](#database-design)
 - [Analytical Queries](#analytical-queries)
@@ -65,7 +66,28 @@ This project was designed to mirror real analytical work done in such organizati
 | `gdp` | GDP in USD |
 | `population` | Country population |
 
-**Note on data scope for Phase 1:** The current database focuses on 10 major economies (India, China, USA, Germany, Brazil, France, Japan, South Africa, Australia, Saudi Arabia) across 2015 to 2022. This scope was chosen deliberately to keep the SQL layer clean and focused on query logic. The Python pipeline in Phase 2 loads the full dataset.
+**Note on data scope:** The database focuses on 10 major economies (India, China, United States, Germany, Brazil, France, Japan, South Africa, Australia, Saudi Arabia) across 2015 to 2022. This scope was chosen deliberately to keep the SQL layer clean and focused on query logic while the Python pipeline handles the full dataset.
+
+---
+
+## Project Structure
+
+```
+global-energy-transition-analyser/
+│
+├── pipeline/                        Phase 2 — Python data pipeline
+│   ├── load_energy_data.py          Reads CSV, filters, loads into staging table
+│   └── transform_energy_data.py     Transforms staging data into star schema tables
+│
+├── notes/                           Personal reference and learning documentation
+│   └── notes.md                     Key patterns, concepts, and syntax notes
+│
+├── energy_analysis.sql              Phase 1 — Star schema design and 15 analytical queries
+├── owid_energy_data.csv             Source dataset from Our World in Data
+├── README.md                        Project documentation
+├── .gitignore                       Excludes .env and virtual environment from Git
+└── LICENSE                          MIT License
+```
 
 ---
 
@@ -75,10 +97,18 @@ This project was designed to mirror real analytical work done in such organizati
 owid_energy_data.csv
         |
         v
-[Phase 2: Python / Pandas / SQLAlchemy]
+[load_energy_data.py — staging layer]
+        |
+        v
+[owid_energy_raw — raw staging table in MySQL]
+        |
+        v
+[transform_energy_data.py — transformation layer]
         |
         v
 [MySQL Database — Star Schema]
+dim_country, dim_year, dim_energy_source
+fact_consumption, fact_country_meta
         |
         v
 [Advanced SQL — Window Functions, CTEs, Stored Procedures, Views]
@@ -109,7 +139,7 @@ The database uses a **star schema** — the industry standard for analytical wor
 
 | Table | Purpose |
 |---|---|
-| `fact_consumption` | Energy consumption in TWh and share of total energy mix, per country per source per year |
+| `fact_consumption` | Energy consumption in TWh per country per source per year |
 | `fact_country_meta` | Population, GDP, and GDP per capita per country per year |
 
 ### Schema Diagram
@@ -176,14 +206,22 @@ Python fundamentals, OOP, Pandas, NumPy, and Matplotlib practiced on sample ener
 - Seeded the database with realistic data derived from the OWID dataset
 - Wrote 15 analytical queries covering aggregations, joins, window functions, CTEs, stored procedures, and views
 
-### Phase 2 — Python Data Pipeline with SQLAlchemy (In Progress)
-- Read and transform `owid_energy_data.csv` using Pandas
-- Connect to MySQL using SQLAlchemy
-- Load cleaned, filtered data into the database programmatically — replacing manual `INSERT` statements
-- Handle data types, null values, and batch inserts
+### Phase 2 — Python Data Pipeline with SQLAlchemy (Completed)
+- Read and filtered `owid_energy_data.csv` using Pandas — 10 countries, 2015 to 2022
+- Connected Python to MySQL using SQLAlchemy and PyMySQL
+- Built a two-script pipeline: staging loader and star schema transformer
+- Loaded 640 rows into `fact_consumption` and 80 rows into `fact_country_meta` automatically
+- Used `ON DUPLICATE KEY UPDATE` for safe, idempotent inserts
+- Managed credentials securely using `.env` and `python-dotenv`
 
-### Phase 3 — Power BI / Tableau Dashboard (Planned)
-- Connect Power BI to the MySQL database or the exported view
+### Phase 3 — Pandas Analysis and Jupyter Notebook (Planned)
+- Pull data from MySQL into Pandas using SQLAlchemy
+- Perform trend analysis, aggregations, and correlation studies
+- Generate visualizations using Matplotlib and Seaborn
+- Present findings in a structured Jupyter notebook
+
+### Phase 4 — Power BI / Tableau Dashboard (Planned)
+- Connect Power BI to the MySQL database or exported view
 - Build interactive dashboards for renewable share trends, YoY growth, and per-capita comparisons
 - Publish and embed dashboard screenshots in this repository
 
@@ -197,6 +235,8 @@ Python fundamentals, OOP, Pandas, NumPy, and Matplotlib practiced on sample ener
 | Python 3 | Data transformation and pipeline scripting |
 | Pandas | CSV reading, data cleaning, transformation |
 | SQLAlchemy | Python-to-MySQL connection layer |
+| PyMySQL | MySQL driver used by SQLAlchemy |
+| python-dotenv | Secure credential management via .env |
 | Power BI / Tableau | Dashboard and visualization layer |
 | Git and GitHub | Version control and project documentation |
 
@@ -208,7 +248,7 @@ Python fundamentals, OOP, Pandas, NumPy, and Matplotlib practiced on sample ener
 
 - MySQL 8.0 or higher installed locally
 - Python 3.9 or higher
-- pip packages: `pandas`, `sqlalchemy`, `pymysql`
+- pip packages: `pandas`, `sqlalchemy`, `pymysql`, `python-dotenv`, `cryptography`
 
 ### Step 1 — Set up the database
 
@@ -220,36 +260,46 @@ source energy_analysis.sql;
 
 This will create the `energy_analyzer` database, all tables, indexes, and seed data in one step.
 
-### Step 2 — Verify the setup
+### Step 2 — Configure environment variables
 
-```sql
-USE energy_analyzer;
-SELECT * FROM dim_country;
-SELECT * FROM fact_consumption LIMIT 10;
+Create a `.env` file in the project root:
+
+```
+DB_USER=root
+DB_PASSWORD=yourpassword
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=energy_analyzer
 ```
 
-### Step 3 — Run the Python pipeline (Phase 2 — coming soon)
+### Step 3 — Install dependencies
 
 ```bash
-pip install pandas sqlalchemy pymysql
-python pipeline/load_energy_data.py
+pip install pandas sqlalchemy pymysql python-dotenv cryptography
 ```
 
-### Step 4 — Explore the analytical queries
+### Step 4 — Run the pipeline
 
-All 15 queries are included in `energy_analysis.sql`. You can run them individually after the `USE energy_analyzer;` statement.
+```bash
+python pipeline/load_energy_data.py
+python pipeline/transform_energy_data.py
+```
+
+### Step 5 — Explore the analytical queries
+
+All 15 queries are included in `energy_analysis.sql`. Run them individually in MySQL Workbench after the `USE energy_analyzer;` statement.
 
 ---
 
 ## Key Findings
 
-These findings are based on the 10-country, 2019-2022 sample dataset used in Phase 1.
+These findings are based on the 10-country, 2015-2022 dataset.
 
-- **China and the USA** are the highest absolute energy consumers, with China's coal consumption exceeding 4,000 TWh annually.
-- **Brazil** derives over 60% of its energy from hydro — the highest renewable share in the sample.
-- **Germany** steadily reduced coal consumption and nuclear capacity simultaneously post-2019, driven by its Energiewende (energy transition) policy.
+- **China and the United States** are the highest absolute energy consumers, with China's coal consumption exceeding 4,000 TWh annually.
+- **Brazil** derives over 60% of its energy from hydro — the highest renewable share in the dataset.
+- **Germany** steadily reduced both coal consumption and nuclear capacity simultaneously post-2019, driven by its Energiewende policy.
 - **Solar energy** showed the highest growth rate among all renewable sources globally between 2019 and 2022, with India and China leading adoption.
-- **India's** solar consumption nearly tripled from 35 TWh (2019) to 98 TWh (2022), representing the fastest absolute growth trajectory in the sample.
+- **India's** solar consumption nearly tripled from 35 TWh (2019) to 98 TWh (2022), representing the fastest absolute growth trajectory in the dataset.
 
 ---
 
@@ -271,9 +321,11 @@ These findings are based on the 10-country, 2019-2022 sample dataset used in Pha
 - HAVING clause for post-aggregation filtering
 
 **Python and Data Engineering**
-- CSV reading and inspection with Pandas
-- Data cleaning and type handling
-- SQLAlchemy ORM for database connectivity (Phase 2)
+- CSV reading, filtering, and column selection with Pandas
+- Two-stage pipeline design: staging layer and transformation layer
+- SQLAlchemy for database connectivity and query execution
+- Safe idempotent inserts using ON DUPLICATE KEY UPDATE
+- Secure credential management with python-dotenv
 
 **Analytical Thinking**
 - Translated real-world energy policy questions into SQL queries
