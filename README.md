@@ -1,6 +1,6 @@
 # Global Energy Transition Analyser
 
-A data analytics portfolio project that models global energy consumption patterns using a structured MySQL database, Python-based data pipelines, and business intelligence dashboards. The project uses real-world data from Our World in Data (OWID) to answer meaningful questions about the energy transition — the global shift from fossil fuels toward renewable energy sources.
+A data analytics portfolio project that models global energy consumption patterns using a structured MySQL database, Python-based data pipelines, and business intelligence dashboards. The project uses real-world data from Our World in Data (OWID) to answer meaningful questions about the energy transition, specifically the global shift from fossil fuels toward renewable energy sources.
 
 ---
 
@@ -30,21 +30,21 @@ This project answers real business questions about global energy:
 - What is the energy consumption per capita across major economies?
 - Which renewable sources are growing the fastest globally?
 
-The project is built end-to-end: raw data is sourced from OWID, transformed through a structured Python pipeline, stored in a normalized star-schema MySQL database, queried with advanced SQL, and visualized in Power BI / Tableau.
+The project is built end-to-end. Raw data is sourced from OWID, transformed through a structured Python pipeline, stored in a normalized star-schema MySQL database, queried with advanced SQL, and visualized through an exploratory data analysis notebook and Power BI dashboards.
 
 ---
 
 ## Why This Project
 
-Energy transition is one of the most data-rich and strategically relevant topics for companies like Siemens, ABB, and Schneider Electric — organizations that operate at the intersection of industrial infrastructure and sustainable energy systems.
+Energy transition is one of the most data-rich and strategically relevant topics for companies like Siemens, ABB, and Schneider Electric. These are organizations that operate at the intersection of industrial infrastructure and sustainable energy systems.
 
-This project was designed to mirror real analytical work done in such organizations: designing a database schema, writing production-quality queries, building reusable views and stored procedures, and presenting insights through dashboards.
+This project was built to mirror real analytical work done in such organizations: designing a database schema, writing production-quality queries, building reusable views and stored procedures, and presenting insights through visualizations and dashboards.
 
 ---
 
 ## Dataset
 
-**Source:** [Our World in Data — Energy Dataset](https://github.com/owid/energy-data)
+**Source:** [Our World in Data - Energy Dataset](https://github.com/owid/energy-data)
 
 **File:** `owid_energy_data.csv`
 
@@ -75,14 +75,17 @@ This project was designed to mirror real analytical work done in such organizati
 ```
 global-energy-transition-analyser/
 │
-├── pipeline/                        Phase 2 — Python data pipeline
+├── notebooks/
+│   └── energy_analysis.ipynb        Phase 3 - EDA and visualizations on energy transition
+│
+├── pipeline/                        Phase 2 - Python data pipeline
 │   ├── load_energy_data.py          Reads CSV, filters, loads into staging table
 │   └── transform_energy_data.py     Transforms staging data into star schema tables
 │
 ├── notes/                           Personal reference and learning documentation
 │   └── notes.md                     Key patterns, concepts, and syntax notes
 │
-├── energy_analysis.sql              Phase 1 — Star schema design and 15 analytical queries
+├── energy_analysis.sql              Phase 1 - Star schema design and 15 analytical queries
 ├── owid_energy_data.csv             Source dataset from Our World in Data
 ├── README.md                        Project documentation
 ├── .gitignore                       Excludes .env and virtual environment from Git
@@ -97,24 +100,27 @@ global-energy-transition-analyser/
 owid_energy_data.csv
         |
         v
-[load_energy_data.py — staging layer]
+[load_energy_data.py - staging layer]
         |
         v
-[owid_energy_raw — raw staging table in MySQL]
+[owid_energy_raw - raw staging table in MySQL]
         |
         v
-[transform_energy_data.py — transformation layer]
+[transform_energy_data.py - transformation layer]
         |
         v
-[MySQL Database — Star Schema]
+[MySQL Database - Star Schema]
 dim_country, dim_year, dim_energy_source
 fact_consumption, fact_country_meta
         |
         v
-[Advanced SQL — Window Functions, CTEs, Stored Procedures, Views]
+[Advanced SQL - Window Functions, CTEs, Stored Procedures, Views]
         |
         v
-[Power BI / Tableau — Dashboards and Reports]
+[energy_analysis.ipynb - EDA, trend analysis, visualizations]
+        |
+        v
+[Power BI / Tableau - Dashboards and Reports]
 ```
 
 The project is structured in phases so that each layer builds on the previous one. A recruiter or reviewer can inspect each phase independently.
@@ -123,7 +129,7 @@ The project is structured in phases so that each layer builds on the previous on
 
 ## Database Design
 
-The database uses a **star schema** — the industry standard for analytical workloads. It separates descriptive information (dimensions) from measurable facts, making queries efficient and readable.
+The database uses a star schema, which is the industry standard for analytical workloads. It separates descriptive information (dimensions) from measurable facts, making queries efficient and readable.
 
 ### Tables
 
@@ -154,9 +160,9 @@ dim_year ────────┘
 
 ### Design Decisions
 
-- `UNIQUE KEY` constraints on fact tables prevent duplicate entries for the same country-source-year combination.
-- Indexes are created on foreign key columns (`country_id`, `source_id`, `year`) to optimize join performance on large datasets.
-- `is_renewable` (boolean) and `is_post_paris` (boolean) flags enable clean conditional aggregations in SQL without complex string matching.
+- UNIQUE KEY constraints on fact tables prevent duplicate entries for the same country-source-year combination.
+- Indexes are created on foreign key columns (country_id, source_id, year) to optimize join performance on large datasets.
+- is_renewable (boolean) and is_post_paris (boolean) flags enable clean conditional aggregations in SQL without complex string matching.
 
 ---
 
@@ -164,7 +170,7 @@ dim_year ────────┘
 
 The project includes 15 analytical queries organized in three tiers of complexity.
 
-### Tier 1 — Core Aggregations
+### Tier 1 - Core Aggregations
 
 | Query | Description |
 |---|---|
@@ -172,7 +178,7 @@ The project includes 15 analytical queries organized in three tiers of complexit
 | Q2 | Renewable energy consumption by country and source in 2022 |
 | Q3 | Energy source with highest total global consumption across all years |
 
-### Tier 2 — Intermediate Analytics
+### Tier 2 - Intermediate Analytics
 
 | Query | Description |
 |---|---|
@@ -182,7 +188,7 @@ The project includes 15 analytical queries organized in three tiers of complexit
 | Q7 | Countries whose coal consumption decreased post-Paris Agreement (CTE) |
 | Q8 | Running cumulative solar consumption per country over years |
 
-### Tier 3 — Advanced SQL and Reusability
+### Tier 3 - Advanced SQL and Reusability
 
 | Query | Description |
 |---|---|
@@ -191,36 +197,36 @@ The project includes 15 analytical queries organized in three tiers of complexit
 | Q11 | Countries where renewable share exceeds fossil share in 2022 (HAVING clause) |
 | Q12 | Rolling 3-year average consumption per country (CTE + window function) |
 | Q13 | Stored procedure: get full energy profile for any country and year |
-| Q14 | View: `vw_renewable_energy` — reusable renewable summary for Power BI |
+| Q14 | View: vw_renewable_energy - reusable renewable summary for Power BI |
 | Q15 | CTE chain: countries with both high GDP and high renewable share |
 
 ---
 
 ## Project Phases
 
-### Phase 0 — Python and Pandas Warm-Up (Completed)
+### Phase 0 - Python and Pandas Warm-Up (Completed)
 Python fundamentals, OOP, Pandas, NumPy, and Matplotlib practiced on sample energy datasets to prepare for the data pipeline phase.
 
-### Phase 1 — MySQL Database and SQL Analytics (Completed)
+### Phase 1 - MySQL Database and SQL Analytics (Completed)
 - Designed the star schema from scratch
 - Seeded the database with realistic data derived from the OWID dataset
 - Wrote 15 analytical queries covering aggregations, joins, window functions, CTEs, stored procedures, and views
 
-### Phase 2 — Python Data Pipeline with SQLAlchemy (Completed)
-- Read and filtered `owid_energy_data.csv` using Pandas — 10 countries, 2015 to 2022
+### Phase 2 - Python Data Pipeline with SQLAlchemy (Completed)
+- Read and filtered owid_energy_data.csv using Pandas, covering 10 countries from 2015 to 2022
 - Connected Python to MySQL using SQLAlchemy and PyMySQL
-- Built a two-script pipeline: staging loader and star schema transformer
-- Loaded 640 rows into `fact_consumption` and 80 rows into `fact_country_meta` automatically
-- Used `ON DUPLICATE KEY UPDATE` for safe, idempotent inserts
-- Managed credentials securely using `.env` and `python-dotenv`
+- Built a two-script pipeline with a staging loader and a star schema transformer
+- Loaded 640 rows into fact_consumption and 80 rows into fact_country_meta automatically
+- Used ON DUPLICATE KEY UPDATE for safe inserts that can be run multiple times without errors
+- Managed credentials securely using .env and python-dotenv
 
-### Phase 3 — Pandas Analysis and Jupyter Notebook (Planned)
-- Pull data from MySQL into Pandas using SQLAlchemy
-- Perform trend analysis, aggregations, and correlation studies
-- Generate visualizations using Matplotlib and Seaborn
-- Present findings in a structured Jupyter notebook
+### Phase 3 - Pandas Analysis and Jupyter Notebook (Completed)
+- Connected MySQL to Pandas using SQLAlchemy and pulled star schema data directly into DataFrames
+- Performed exploratory data analysis across 10 countries and 8 energy sources
+- Built 10 visualizations covering total consumption, renewable vs fossil breakdown, renewable share percentage, global renewable trends, India vs China solar comparison, GDP vs renewable correlation, coal consumption post-Paris Agreement, and a full energy source heatmap
+- Documented key findings and a conclusive analysis as markdown cells within the notebook
 
-### Phase 4 — Power BI / Tableau Dashboard (Planned)
+### Phase 4 - Power BI / Tableau Dashboard (Planned)
 - Connect Power BI to the MySQL database or exported view
 - Build interactive dashboards for renewable share trends, YoY growth, and per-capita comparisons
 - Publish and embed dashboard screenshots in this repository
@@ -233,10 +239,12 @@ Python fundamentals, OOP, Pandas, NumPy, and Matplotlib practiced on sample ener
 |---|---|
 | MySQL | Relational database and analytical querying |
 | Python 3 | Data transformation and pipeline scripting |
-| Pandas | CSV reading, data cleaning, transformation |
+| Pandas | CSV reading, data cleaning, transformation, and analysis |
+| Matplotlib and Seaborn | Data visualization and chart generation |
 | SQLAlchemy | Python-to-MySQL connection layer |
 | PyMySQL | MySQL driver used by SQLAlchemy |
 | python-dotenv | Secure credential management via .env |
+| Jupyter Notebook | Interactive analysis and findings documentation |
 | Power BI / Tableau | Dashboard and visualization layer |
 | Git and GitHub | Version control and project documentation |
 
@@ -248,9 +256,9 @@ Python fundamentals, OOP, Pandas, NumPy, and Matplotlib practiced on sample ener
 
 - MySQL 8.0 or higher installed locally
 - Python 3.9 or higher
-- pip packages: `pandas`, `sqlalchemy`, `pymysql`, `python-dotenv`, `cryptography`
+- pip packages: pandas, sqlalchemy, pymysql, python-dotenv, cryptography, matplotlib, seaborn, jupyter
 
-### Step 1 — Set up the database
+### Step 1 - Set up the database
 
 Open your MySQL client (Workbench or terminal) and run:
 
@@ -258,11 +266,11 @@ Open your MySQL client (Workbench or terminal) and run:
 source energy_analysis.sql;
 ```
 
-This will create the `energy_analyzer` database, all tables, indexes, and seed data in one step.
+This will create the energy_analyzer database, all tables, indexes, and seed data in one step.
 
-### Step 2 — Configure environment variables
+### Step 2 - Configure environment variables
 
-Create a `.env` file in the project root:
+Create a .env file in the project root:
 
 ```
 DB_USER=root
@@ -272,34 +280,40 @@ DB_PORT=3306
 DB_NAME=energy_analyzer
 ```
 
-### Step 3 — Install dependencies
+### Step 3 - Install dependencies
 
 ```bash
-pip install pandas sqlalchemy pymysql python-dotenv cryptography
+pip install pandas sqlalchemy pymysql python-dotenv cryptography matplotlib seaborn jupyter
 ```
 
-### Step 4 — Run the pipeline
+### Step 4 - Run the pipeline
 
 ```bash
 python pipeline/load_energy_data.py
 python pipeline/transform_energy_data.py
 ```
 
-### Step 5 — Explore the analytical queries
+### Step 5 - Explore the analytical queries
 
-All 15 queries are included in `energy_analysis.sql`. Run them individually in MySQL Workbench after the `USE energy_analyzer;` statement.
+All 15 queries are included in energy_analysis.sql. Run them individually in MySQL Workbench after the USE energy_analyzer; statement.
+
+### Step 6 - Open the analysis notebook
+
+```bash
+jupyter notebook notebooks/energy_analysis.ipynb
+```
 
 ---
 
 ## Key Findings
 
-These findings are based on the 10-country, 2015-2022 dataset.
+These findings are based on the 10-country dataset covering 2015 to 2022.
 
-- **China and the United States** are the highest absolute energy consumers, with China's coal consumption exceeding 4,000 TWh annually.
-- **Brazil** derives over 60% of its energy from hydro — the highest renewable share in the dataset.
-- **Germany** steadily reduced both coal consumption and nuclear capacity simultaneously post-2019, driven by its Energiewende policy.
-- **Solar energy** showed the highest growth rate among all renewable sources globally between 2019 and 2022, with India and China leading adoption.
-- **India's** solar consumption nearly tripled from 35 TWh (2019) to 98 TWh (2022), representing the fastest absolute growth trajectory in the dataset.
+- China and the United States are the dominant energy consumers across all sources. Together they consume more than the remaining eight countries combined in oil and natural gas categories.
+- Brazil leads in renewable share percentage, driven almost entirely by hydroelectric power. Saudi Arabia sits at zero percent renewable share, making it the most fossil-dependent economy in the dataset and the most exposed to any future carbon reduction policies.
+- Solar energy showed the steepest growth globally from 2015 to 2022. A notable dip in 2019 was caused by China cutting solar subsidies in 2018, which disrupted the global solar market and slowed India's trajectory as well since India imports a large share of its solar panels from China.
+- The Paris Agreement did not cause an immediate reduction in coal consumption. Real reductions in China and the US appeared two to three years later, driven by domestic air quality concerns and the falling economics of natural gas rather than the international commitment itself.
+- Wealth does not strongly correlate with renewable share. Natural resource availability, geography, and domestic policy turned out to be stronger predictors than GDP per capita across this dataset.
 
 ---
 
@@ -312,7 +326,7 @@ These findings are based on the 10-country, 2015-2022 dataset.
 - Index strategy for query optimization
 
 **SQL**
-- Multi-table JOINs across normalized schema
+- Multi-table JOINs across a normalized schema
 - Conditional aggregations using CASE WHEN
 - Window functions: LAG, RANK, SUM OVER, AVG OVER with custom ROWS frames
 - Common Table Expressions (CTEs) including chained CTEs
@@ -322,15 +336,21 @@ These findings are based on the 10-country, 2015-2022 dataset.
 
 **Python and Data Engineering**
 - CSV reading, filtering, and column selection with Pandas
-- Two-stage pipeline design: staging layer and transformation layer
+- Two-stage pipeline design with a staging layer and a transformation layer
 - SQLAlchemy for database connectivity and query execution
 - Safe idempotent inserts using ON DUPLICATE KEY UPDATE
 - Secure credential management with python-dotenv
 
+**Data Analysis and Visualization**
+- Exploratory data analysis across multiple dimensions
+- Trend analysis, country comparisons, and correlation studies
+- Bar charts, line charts, scatter plots, and heatmaps using Matplotlib and Seaborn
+- Translating visual patterns into written analytical insights
+
 **Analytical Thinking**
-- Translated real-world energy policy questions into SQL queries
-- Chose appropriate aggregation windows (rolling 3-year, cumulative, YoY)
-- Designed schema with future dashboard integration in mind
+- Translated real-world energy policy questions into SQL queries and Python analysis
+- Identified counterintuitive patterns such as wealth not correlating with renewable adoption
+- Connected data observations to real-world geopolitical and economic context
 
 ---
 
@@ -338,4 +358,4 @@ These findings are based on the 10-country, 2015-2022 dataset.
 
 This project is part of a personal data analytics portfolio built during final-year engineering studies, targeting roles in data analytics and business intelligence. The domain was chosen to reflect the energy and infrastructure industry context relevant to companies like Siemens Smart Infrastructure.
 
-Dataset credit: Hannah Ritchie, Pablo Rosado, Max Roser — Our World in Data Energy Dataset. Licensed under CC BY 4.0.
+Dataset credit: Hannah Ritchie, Pablo Rosado, Max Roser - Our World in Data Energy Dataset. Licensed under CC BY 4.0.
